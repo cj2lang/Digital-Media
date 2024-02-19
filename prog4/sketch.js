@@ -2,43 +2,61 @@ let sprite;
 let i;
 let direction;
 let characters = [];
+let gameFont;
+let gameOver = false;
+let timeRemaining = 30;
+
+let animations = {
+  stand: {row: 0, frames: 1},
+  walkRight: {row: 0, col: 1, frames: 8},
+  walkUp: {row: 5, frames: 6},
+  walkDown: {row: 5, col: 6, frames: 6}
+};
 
 function preload() {
-  let animations = {
-    stand: {row: 0, frames: 1},
-    walkRight: {row: 0, col: 1, frames: 8},
-    walkUp: {row: 5, frames: 6},
-    walkDown: {row: 5, col: 6, frames: 6}
-  };
-
   for (i = 0; i <= 20; i++){
     characters.push(new Character(random(400), random(400), 80, 80, 'assets/SpelunkyGuy.png', animations));
   }
+
+  gameFont = loadFont("assets/PressStart2P-Regular.ttf");
 }
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(600, 600);
 }
 
 function draw() {
-  background(0);
-  
+  background(200);
+  textFont(gameFont);
+
+  if(gameOver){
+    gameDone();
+  }else{
+    playing();
+  }
+}
+
+function playing(){
+  textSize(16);
+  text("Score: 0", 20, 20);
+  text("Time remaining: " + ceil(timeRemaining), width - 300, 20);
+
   characters.forEach((character) => {
-    // if (kb.pressing('d')) {
-    //   character.walkRight();
-    // } else if (kb.pressing('a')) {
-    //   character.walkLeft();
-    // } else if(kb.pressing('w')) {
-    //   character.walkUp();
-    // } else if(kb.pressing('s')) {
-    //   character.walkDown();
-    // } else {
-    //   character.stop();
-    // }
+    if (character.stepCounter === undefined) {
+      character.stepCounter = 0;
+      character.maxSteps = floor(random(30, 200));
+      character.direction = floor(random(4));
+    }
+  
+    if (character.stepCounter < character.maxSteps) {
+      character.stepCounter++;
+    } else {
+      character.direction = floor(random(4));
+      character.stepCounter = 0;
+      character.maxSteps = floor(random(10, 30));
+    }
 
-    direction = floor(random(4));
-
-    switch(direction){
+    switch(character.direction){
       case 0:
         character.walkRight();
         break;
@@ -67,6 +85,17 @@ function draw() {
 
     character.sprite.update();
   })
+
+  timeRemaining -= deltaTime / 1000;
+  if(timeRemaining < 0){
+    gameOver = true;
+  }
+}
+
+function gameDone(){
+  text("Time Up!", 85, 100);
+  text("Final Score: 0", 85, 150);
+  text("Press P to play again!", 85, 200)
 }
 
 class Character{
@@ -74,7 +103,7 @@ class Character{
     this.sprite = new Sprite(x, y, width, height);
     this.sprite.spriteSheet = spriteSheet;
   
-    this.sprite.anis.frameDelay = 6;
+    this.sprite.anis.frameDelay = 20; //need to add each time it is clicked, frameDelay--
     this.sprite.collider = 'none';
     this.sprite.addAnis(animations);
     this.sprite.changeAni('stand');
@@ -113,20 +142,20 @@ class Character{
   }
 }
 
+function keyTyped() {
+  if(gameOver){
+    if(key === 'p'){
+      console.log(keyTyped);
+      timeRemaining = 30;
+      gameOver = false;
+      reset();
+    }
+  }
+}
 
-function keyTypedOld() {
-  switch(key){
-    case 'd': 
-      walkRight();
-      break;
-    case'a':
-      walkLeft();
-      break;
-    case 'w':
-      walkUp();
-      break;
-    case 's':
-      walkDown();
-      break;
+function reset(){
+  characters = [];
+  for (i = 0; i <= 20; i++){
+    characters.push(new Character(random(400), random(400), 80, 80, 'assets/SpelunkyGuy.png', animations));
   }
 }
