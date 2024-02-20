@@ -5,6 +5,8 @@ let characters = [];
 let gameFont;
 let gameOver = false;
 let timeRemaining = 30;
+let bugsKilled = 0;
+let finalScore = 0;
 
 let animations = {
   stand: {row: 0, frames: 1},
@@ -15,7 +17,7 @@ let animations = {
 
 function preload() {
   for (i = 0; i <= 20; i++){
-    characters.push(new Character(random(400), random(400), 80, 80, 'assets/SpelunkyGuy.png', animations));
+    characters.push(new Character(random(600), random(40, 600), 80, 80, 'assets/SpelunkyGuy.png', animations));
   }
 
   gameFont = loadFont("assets/PressStart2P-Regular.ttf");
@@ -29,6 +31,9 @@ function draw() {
   background(200);
   textFont(gameFont);
 
+  fill(255);
+  rect(0, 0, width, 30);
+
   if(gameOver){
     gameDone();
   }else{
@@ -37,14 +42,17 @@ function draw() {
 }
 
 function playing(){
+  fill(0);
   textSize(16);
-  text("Score: 0", 20, 20);
+  text("Bugs Killed: " + bugsKilled, 20, 20);
   text("Time remaining: " + ceil(timeRemaining), width - 300, 20);
 
   characters.forEach((character) => {
+  if(!character.stopped){
+
     if (character.stepCounter === undefined) {
       character.stepCounter = 0;
-      character.maxSteps = floor(random(30, 200));
+      character.maxSteps = floor(random(30, 500));
       character.direction = floor(random(4));
     }
   
@@ -79,9 +87,10 @@ function playing(){
       character.walkRight();
     }else if ((character.sprite.y + (character.sprite.height/4)) > height) {
       character.walkUp();
-    }else if ((character.sprite.y - (character.sprite.height/4)) < 0) {
+    }else if ((character.sprite.y - (character.sprite.height/4)) < 40) {
       character.walkDown();
     }
+  }
 
     character.sprite.update();
   })
@@ -93,8 +102,15 @@ function playing(){
 }
 
 function gameDone(){
+  finalScore = bugsKilled;
+  fill(255);
+  rect(50, 50, 500, 200);
+
+  fill(0);
+  text("Bugs Killed: " + finalScore, 20, 20);
+  text("Time remaining: 0", width - 300, 20);
   text("Time Up!", 85, 100);
-  text("Final Score: 0", 85, 150);
+  text("Bugs Killed: " + finalScore, 85, 150);
   text("Press P to play again!", 85, 200)
 }
 
@@ -107,12 +123,28 @@ class Character{
     this.sprite.collider = 'none';
     this.sprite.addAnis(animations);
     this.sprite.changeAni('stand');
+    this.stopped = false;
   }
 
   stop(){
     this.sprite.vel.x = 0;
     this.sprite.vel.y = 0;
     this.sprite.changeAni('stand');
+    this.stopped = true;
+  }
+
+  reset(){
+    this.sprite.x = random(600);
+    this.sprite.y = random(600);
+    this.stopped = false;
+    this.sprite.changeAni('stand');
+    this.sprite.anis.frameDelay = 20;
+  }
+
+  speedUp(){
+    if(!this.stopped){
+      this.sprite.anis.frameDelay--;
+    }
   }
 
   walkRight() {
@@ -140,6 +172,16 @@ class Character{
     this.sprite.vel.x = 0;
     this.sprite.vel.y = 1;
   }
+
+  contains(x, y){
+    let leftEdge = this.sprite.x - (this.sprite.width / 2);
+    let rightEdge = this.sprite.x + (this.sprite.width / 2);
+    let topEdge = this.sprite.y - (this.sprite.height / 2);
+    let bottomEdge = this.sprite.y + (this.sprite.height / 2);
+    let insideX = (x >= leftEdge && x <= rightEdge);
+    let insideY = (y >= topEdge && y <= bottomEdge);
+    return insideX && insideY;
+  }
 }
 
 function keyTyped() {
@@ -153,9 +195,18 @@ function keyTyped() {
   }
 }
 
-function reset(){
-  characters = [];
-  for (i = 0; i <= 20; i++){
-    characters.push(new Character(random(400), random(400), 80, 80, 'assets/SpelunkyGuy.png', animations));
+function mousePressed(){
+  for(let i = 0; i < characters.length; i++){
+    if (characters[i].contains(mouseX, mouseY)){
+      characters[i].stop();
+      bugsKilled++;
+    }else{
+      characters[i].speedUp();
+    }
   }
+}
+
+function reset(){
+  characters.forEach(character => character.reset());
+  bugsKilled = 0;
 }
