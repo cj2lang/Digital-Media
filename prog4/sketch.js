@@ -9,15 +9,14 @@ let bugsKilled = 0;
 let finalScore = 0;
 
 let animations = {
-  stand: {row: 0, frames: 1},
-  walkRight: {row: 0, col: 1, frames: 8},
-  walkUp: {row: 5, frames: 6},
-  walkDown: {row: 5, col: 6, frames: 6}
+  stand: {row: 2, frames: 1},
+  walkLeft: {row: 1, frames: 4},
+  walkUp: {row: 0, frames: 4}
 };
 
 function preload() {
   for (i = 0; i <= 20; i++){
-    characters.push(new Character(random(600), random(40, 600), 80, 80, 'assets/SpelunkyGuy.png', animations));
+    characters.push(new Character(random(600), random(40, 600), 32, 32, 'assets/bugSpriteSheet.png', animations));
   }
 
   gameFont = loadFont("assets/PressStart2P-Regular.ttf");
@@ -135,7 +134,7 @@ class Character{
 
   reset(){
     this.sprite.x = random(600);
-    this.sprite.y = random(600);
+    this.sprite.y = random(40, 600);
     this.stopped = false;
     this.sprite.changeAni('stand');
     this.sprite.anis.frameDelay = 20;
@@ -148,17 +147,17 @@ class Character{
   }
 
   walkRight() {
-    this.sprite.changeAni('walkRight');
+    this.sprite.changeAni('walkLeft');
     this.sprite.vel.x = 1;
     this.sprite.vel.y = 0;
-    this.sprite.scale.x = 1;
+    this.sprite.scale.x = -1;
   }
   
   walkLeft() {
-    this.sprite.changeAni('walkRight');
+    this.sprite.changeAni('walkLeft');
     this.sprite.vel.x = -1;
     this.sprite.vel.y = 0;
-    this.sprite.scale.x = -1;
+    this.sprite.scale.x = 1;
   }
   
   walkUp() {
@@ -168,9 +167,10 @@ class Character{
   }
   
   walkDown() {
-    this.sprite.changeAni('walkDown');
+    this.sprite.changeAni('walkUp');
     this.sprite.vel.x = 0;
     this.sprite.vel.y = 1;
+    this.sprite.scale.y = -1;
   }
 
   contains(x, y){
@@ -199,7 +199,9 @@ function mousePressed(){
   for(let i = 0; i < characters.length; i++){
     if (characters[i].contains(mouseX, mouseY)){
       characters[i].stop();
-      bugsKilled++;
+      if(!gameOver){
+        bugsKilled++;
+      }
     }else{
       characters[i].speedUp();
     }
