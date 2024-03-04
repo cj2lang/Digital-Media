@@ -4,11 +4,16 @@ let bend = new Tone.PitchShift();
 
 let notes= {
   'a' : "C4",
+  'w' : "C#4",
   's' : "D4",
+  'e' : "D#4",
   'd' : "E4",
   'f' : "F4",
+  't' : "F#4",
   'g' : "G4",
+  'y' : "G#4",
   'h' : "A4",
+  'u' : "A#4",
   'j' : "B4",
   'k' : "C5"
 }
@@ -42,12 +47,8 @@ function keyPressed (){
   }
 }
 
-// function keyReleased (){
-//   let playNotes = notes[key];
-//   synth.triggerRelease(playNotes, '+0.03');
-// }
-
 function draw() {
   background(220);
-  text("Play A-K for Synth", 150, 150);
+  text("Play A-K for Naturals", 150, 150);
+  text("Play W,E,T,Y,U for Sharps", 150, 170);
 }
