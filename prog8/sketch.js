@@ -4,11 +4,21 @@ let boxes;
 let mouseClicked = false;
 let x;
 let y;
+let sounds = new Tone.Players({
+  'piano': "assets/piano.mp4",
+  'pencil': "assets/pencil.mp3"
+}).toDestination();
 
 
 function setup() {
   createCanvas(800, 400);
   selectedColor = color('white');
+
+  sounds.player('piano').loop = true;
+
+  Tone.loaded().then(() => {
+    sounds.player('piano').start();
+  });
 
   boxes = [
     new Box(5, 5, color('red')),
@@ -44,17 +54,26 @@ function mousePressed() {
 
   if(!isInBox) {
     mouseClicked = true;
+    if (sounds.player('pencil').state !== "started") {
+      sounds.player('pencil').loop = true;
+      sounds.player('pencil').start();
+    }
   }
 }
 
+function mouseReleased() {
+  sounds.player('pencil').stop();
+}
+
 function mouseDragged(){
-  if (mouseClicked = true){
+  if (mouseClicked == true){
     x += mouseX - pmouseX;
     y += mouseY - pmouseY;
   }
   noStroke();
   fill(selectedColor);
   ellipse(pmouseX, pmouseY, 30);
+  
 }
 
 class Box {
