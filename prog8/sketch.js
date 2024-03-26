@@ -6,7 +6,8 @@ let x;
 let y;
 let sounds = new Tone.Players({
   'piano': "assets/piano.mp4",
-  'pencil': "assets/pencil.mp3"
+  'pencil': "assets/pencil.mp3",
+  'select': "assets/select.mp3"
 }).toDestination();
 
 
@@ -49,6 +50,7 @@ function mousePressed() {
     if(boxes[i].contains(mouseX,mouseY)) {
       selectedColor = boxes[i].fill;
       isInBox = true;
+      sounds.player('select').start();
     }
   }
 
