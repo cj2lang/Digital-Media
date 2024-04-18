@@ -1,8 +1,8 @@
+//Caleb Langley
+
 let port;
-let joyX = 0, joyY = 0, sw = 0;
-let connectButton;
 let circleX, circleY;
-let speed = 3;
+let connectButton;
 
 function setup() {
   port = createSerial();
@@ -17,46 +17,22 @@ function setup() {
   if (usedPorts.length > 0) {
     port.open(usedPorts[0], 57600);
   }
-  frameRate(20);
+  frameRate(100);
 }
 
 function draw() {
   background(220);
 
-
-  // let characters = port.available();
-  // let str = port.read(characters);
-  // let lines = str.split("\n");
-  // let latest = "";
-  // if (lines.length > 0) {
-  //   let lastIndex = lines.length > 1 ? lines.length-2 : lines.length - 1;
-  //   latest = lines[lastIndex];
-  // }
   let latest = port.readUntil("\n");
-  let values = latest.split(",");
-  if (values.length > 2) {
-    joyX = values[0];
-    joyY = values[1];
-    sw = Number(values[2]);
-
-    if (joyX > 0) {
-      circleX += speed;
-    } else if (joyX < 0) {
-      circleX -= speed;
-    }
-
-    if (joyY > 0) {
-      circleY += speed;
-    } else if (joyY < 0) {
-      circleY -= speed;
-    }
+  if (latest.length > 0) {
+    let potValue = parseInt(latest.trim());
+    circleX = map(potValue, 0, 1023, 0, width);
   }
-
   noStroke();
   fill('purple');
-  rect(0,0,width/2,height);
+  rect(0, 0, width / 2, height);
   fill('gold');
-  rect(width/2,0,width/2,height);
+  rect(width / 2, 0, width / 2, height);
 
   if (port.opened() && frameCount % 3 == 0) {
     let pixel = get(circleX, circleY);
@@ -66,13 +42,8 @@ function draw() {
   }
 
   stroke(0);
-  if (sw == 1) {
-    fill("blue");
-  }
-  else {
-    fill (255);
-  }
-  circle(circleX, circleY, 5);
+  fill(255);
+  circle(circleX, circleY, 20);
 }
 
 function connect() {
@@ -82,3 +53,7 @@ function connect() {
     port.close();
   }
 }
+
+
+// Circle seems to randomly jump left and right on the screen. I could not figure it out.
+// I tried to use a potentiometer to move the circle left and right.
