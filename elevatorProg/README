@@ -1,0 +1,17 @@
+Caleb Langley CSC 2463 Final Project
+
+This project simulates an elevator in a fictional office building.
+It moves between 5 floors. These include the lobby, office space, cafeteria, boss' office, and a penthouse suite.
+When the elevator is "in motion", an image of elevator doors is shown and a jingle plays in the background.
+Once the new floor is reached, a ding is heard and the new floor is shown.
+
+The user can interact with the elevator by using the arduino board. It is set up with 5 buttons and 5 led lights.
+The buttons are mapped to each floor. The bottom-most being 1, and the top-most being 5.
+The leds are there to indicate which floor is currently selected.
+
+The arduino sends a signal to the p5 sketch telling which floor to move to.
+Once the new floor is reached, the p5 sketch sends a signal back to the arduino board indicating which led is to be lit up.
+The leds are set up just like the buttons. Bottom-most being 1 and top-most being 5.
+
+An image of the board setup can be found in this directory. It is called ElevatorArduino.jpg
+A youtube video of this system in use can be found at https://youtube.com/shorts/gd1LhPav-Qw
